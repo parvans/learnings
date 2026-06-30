@@ -1,6 +1,4 @@
-import { Slot, Stack } from "expo-router";
-import { FlatList, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Slot } from "expo-router";
 import "../global.css";
 const listItems = [
   { id: 1, title: "Item 1" },
