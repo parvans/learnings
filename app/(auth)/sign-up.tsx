@@ -66,10 +66,10 @@ export default function SignUp() {
         />
         <Text 
           className='text-3xl font-bold text-gray-800 mb-2'>
-          Create Account
+          Verify Your Account{" "}
         </Text>
         <Text className='text-gray-500 mb-8'>
-          Find your perfect home with our app.
+          {email}
         </Text>
 
         {/* Verification Form */}
@@ -83,6 +83,13 @@ export default function SignUp() {
             value={code}
             onChangeText={setCode}
           />
+          {
+            errors?.fields?.code && (
+              <Text className='text-red-500 mb-4'>
+                {errors.fields.code?.message}
+              </Text>
+            )
+          }
         </View>
         <TouchableOpacity 
          className='bg-blue-600 rounded-xl py-3 mb-4 items-center' 
