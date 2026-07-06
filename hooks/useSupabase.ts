@@ -4,9 +4,12 @@ import { useMemo } from "react";
 
 export function useSupabase(){
     const { getToken } = useAuth();
+    
 
     const client = useMemo(
-        ()=>createClerkSupabaseClient(()=> getToken()), 
+        ()=>
+        createClerkSupabaseClient(()=> 
+            getToken({template: "supabase"})), 
         [getToken]
     );
 
