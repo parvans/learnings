@@ -5,7 +5,7 @@ const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-export function createSupabaseClient(
+export function createClerkSupabaseClient(
     getToken:()=>Promise<string|null>
 ){
     return createClient(supabaseUrl, supabaseKey,{
