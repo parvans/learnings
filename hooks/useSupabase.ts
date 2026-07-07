@@ -9,7 +9,7 @@ export function useSupabase(){
     const client = useMemo(
         ()=>
         createClerkSupabaseClient(()=> 
-            getToken({template: "supabase"})), 
+            getToken()), 
         [getToken]
     );
 

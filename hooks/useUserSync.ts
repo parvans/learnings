@@ -27,7 +27,7 @@ export const useUserSync = () => {
             return;
         }
 
-        const { data: newUser } = await authSupabase
+        const { data: newUser, error } = await authSupabase
         .from("users")
         .insert({
             clerk_id: user!.id,
@@ -39,7 +39,11 @@ export const useUserSync = () => {
         .select("is_admin")
         .single();
 
-        setIsAdmin(newUser?.is_admin ?? false);
-
+        if (error) {
+            console.error("Error inserting new user:", error);
+        } else {
+            setIsAdmin(newUser?.is_admin ?? false);
+            console.log("New user inserted into Supabase:", newUser);
+        }
     }
 }
