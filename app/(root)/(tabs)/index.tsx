@@ -1,9 +1,9 @@
 import { supabase } from '@/lib/supabase';
-import { Property } from '@/types';
+import { Error, Property } from '@/types';
 import { useUser } from '@clerk/expo'
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react'
-import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, FlatList, Image, RefreshControl, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from "@expo/vector-icons";
 import FeaturedCard from '@/components/FeaturedCard';
@@ -16,29 +16,55 @@ export default function HomeScreen() {
   const [featured, setFeatured] = useState<Property[]>([]);
   const [recommended, setRecommended] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error>({state:false,message:''});
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchProperties = async () => {
-    try {
+  const fetchProperties = async (isRefreshing = false) => {
+  try {
+    if (isRefreshing) {
+      setRefreshing(true);
+    } else {
       setLoading(true);
-        const { data:featuredData } = await supabase.from('properties')
-          .select('*')
-          .eq('is_featured', true)
-          .order('created_at', { ascending: false });
-  
-        const { data:recommendedData } = await supabase.from('properties')
-          .select('*')
-          .eq('is_featured', false)
-          .order('created_at', { ascending: false });
-        
-      setFeatured(featuredData ?? []);
-      setRecommended(recommendedData ?? []);
-      setLoading(false);
-      
-    } catch (error) {
-      console.error('Error fetching properties:', error);
-      setLoading(false);
     }
+
+    setError({
+      state: false,
+      message: "",
+    });
+
+    const [
+      { data: featuredData, error: featuredError },
+      { data: recommendedData, error: recommendedError },
+    ] = await Promise.all([
+      supabase
+        .from("properties")
+        .select("*")
+        .eq("is_featured", true)
+        .order("created_at", { ascending: false }),
+
+      supabase
+        .from("properties")
+        .select("*")
+        .eq("is_featured", false)
+        .order("created_at", { ascending: false }),
+    ]);
+
+    if (featuredError || recommendedError) {
+      throw featuredError || recommendedError;
+    }
+
+    setFeatured(featuredData ?? []);
+    setRecommended(recommendedData ?? []);
+  } catch (err: any) {
+    setError({
+      state: true,
+      message: err.message,
+    });
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
   }
+};
 
   useFocusEffect(
     useCallback(()=>{
@@ -98,6 +124,11 @@ export default function HomeScreen() {
 
             {/* Featured properties */}
             <View className='mb-6'>
+              {error.state ? (
+                <Text className='text-red-500 px-5 py-4 text-center'>
+                  {error.message}
+                </Text>
+              ) : null}
               <Text className='text-lg text-gray-900 px-5 font-bold mb-4'>
                 Featured
               </Text>
@@ -139,6 +170,12 @@ export default function HomeScreen() {
               </Text>
             </View>
           ):null
+        }
+        refreshControl={
+          <RefreshControl
+          refreshing={refreshing}
+          onRefresh={() => fetchProperties(true)}
+          />
         }
       />
     </SafeAreaView>

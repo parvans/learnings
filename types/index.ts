@@ -15,3 +15,8 @@ export interface Property {
     is_featured: boolean;
     is_sold: boolean;
 }
+
+export interface Error {
+    state:boolean;
+    message:string;
+}
