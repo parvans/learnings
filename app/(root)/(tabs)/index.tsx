@@ -7,6 +7,7 @@ import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from "@expo/vector-icons";
 import FeaturedCard from '@/components/FeaturedCard';
+import PropertyCard from '@/components/PropertyCard';
 
 export default function HomeScreen() {
   const { user } = useUser();
@@ -89,7 +90,7 @@ export default function HomeScreen() {
               onPress={()=>
                 router.push('/(root)/(tabs)/search?openFilters=true')
               }
-              className='w-8 h-8 items-center justify-center bg-blue-600 rounded-xl'
+              className='w-8 h-8 items-center justify-center bg-blue-500 rounded-xl'
               >
                 <Ionicons name='options-outline' color='white' size={15}/>
               </TouchableOpacity>
@@ -125,12 +126,9 @@ export default function HomeScreen() {
           </View>
         }
         renderItem={({ item }) => (
-          <View className='px-5'>
-            <Text>{item.title}</Text>
-            <Text>{item.description}</Text>
-            <Text>{item.description}</Text>
-            <Text>{item.description}</Text>
-          </View>
+          <PropertyCard 
+           property={item}
+          />
         )}
 
         ListEmptyComponent={
