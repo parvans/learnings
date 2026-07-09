@@ -3,9 +3,10 @@ import { Property } from '@/types';
 import { useUser } from '@clerk/expo'
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react'
-import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from "@expo/vector-icons";
+import FeaturedCard from '@/components/FeaturedCard';
 
 export default function HomeScreen() {
   const { user } = useUser();
@@ -95,9 +96,26 @@ export default function HomeScreen() {
             </TouchableOpacity>
 
             {/* Featured properties */}
-            <Text>
-              FEATURED
-            </Text>
+            <View className='mb-6'>
+              <Text className='text-lg text-gray-900 px-5 font-bold mb-4'>
+                Featured
+              </Text>
+              {loading ? (
+                <ActivityIndicator 
+                  size='small' 
+                  color='#2563EB' 
+                  className='py-10'
+                />):(
+                <FlatList
+                data={featured}
+                keyExtractor={(item) => item.id}
+                horizontal
+                contentContainerStyle={{paddingBottom:20}}
+                showsHorizontalScrollIndicator={false}
+                renderItem={({item})=> <FeaturedCard property={item} />}
+                />
+              )}
+            </View>
 
             {/* recommended Properties */}
             <Text className='text-lg text-gray-900 px-5 font-bold mb-4'>
