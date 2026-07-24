@@ -1,4 +1,4 @@
-import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, Modal, TouchableOpacity, ScrollView, TextInput } from 'react-native'
 import React, { useState } from 'react'
 import { PropertyType, useFilterStore } from '@/store/filterStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -159,24 +159,77 @@ export default function FilterModal({
                 >
                 Price Range
                 </Text>
-                <View>
-                    
-                </View>
-                {/* <View className='flex-row flex-wrap gap-2 mb-6'>
-                    {
-                        PRICE_PRESETS.map((item)=>(
-                            <TouchableOpacity
-                            key={String(item.label)}
-                            onPress={()=>setBedrooms(item.value)}
+                <View className='flex-row gap-3 mb-3'>
+                    {[
+                        {
+                            label:"Min Price",
+                            value:localMin,
+                            onChange:setLocalMin,
+                            placeHolder:"0"
+                        },
+                        {
+                            label:"Max Price",
+                            value:localMax,
+                            onChange:setLocalMax,
+                            placeHolder:"Any"
+                        },
+                    ].map(({label,value,onChange,placeHolder})=>(
+                        <View key={label} className='flex-1'>
+                            <Text className='text-xs text-gray-500 mb-1.5 font-medium'>{label}</Text>
+                            <View 
+                            className='bg-white flex-row gap-3 items-center px-3 
+                            rounded-2xl border border-gray-200'
                             style={shadowStyle}
-                            className={chip(bedrooms===item.value)}
                             >
-                                <Text className={chipText(bedrooms===item.value)}>{item.label}</Text>
-                            </TouchableOpacity>
-                        ))
+                            <Text className='text-gray-400 text-sm mr-1'>$</Text>
+                                <TextInput
+                                className='flex-1 py-3 text-gray-800'
+                                keyboardType='numeric'
+                                placeholderTextColor="#9CA3AF"
+                                placeholder={placeHolder}
+                                value={value}
+                                onChangeText={onChange}
+                                />
+                            </View>
+                        </View>
+                    ))}
+                </View>
+                <View className='flex-row flex-wrap gap-2 mb-6'>
+                    {
+                        PRICE_PRESETS.map((p)=>{
+                            const active = minPrice === p.min && MaxPrice === p.max;
+                            return (
+                                <TouchableOpacity
+                                key={p.label}
+                                onPress={()=>{
+                                    setLocalMin(p.min ? String(p.min):"");
+                                    setLocalMax(p.max ? String(p.max):"");
+                                    setMinPrice(p.min);
+                                    setMaxPrice(p.max);
+                                }}
+                                className={`px-3 py-1.5 rounded-full border
+                                    ${active ? "bg-blue-50 border-blue-300" 
+                                    : "bg-white border-gray-200"}`
+                                }
+                                >
+                                    <Text>{p.label}</Text>
+                                </TouchableOpacity>
+                            )
+                        })
                     }
-                </View>  */}
+                </View> 
             </ScrollView>
+            <View className='px-5 pb-8 pt-4 bg-white border-t border-gray-100'>
+                <TouchableOpacity
+                onPress={handleApply}
+                className='bg-blue-600 py-4 rounded-2xl items-center'
+                style={shadowStyle}
+                >
+                    <Text 
+                    className='text-white font-bold text-base'
+                    >Add Filters {activeCount > 0 ? `(${activeCount})` : ""}</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     </Modal>
   )
