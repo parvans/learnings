@@ -1,10 +1,14 @@
+import FeaturedCard from '@/components/FeaturedCard'
 import FilterModal from '@/components/FilterModal'
+import PropertyCard from '@/components/PropertyCard'
+import { supabase } from '@/lib/supabase'
+import { formatPrice } from '@/lib/utils'
 import { useFilterStore } from '@/store/filterStore'
 import { Property } from '@/types'
 import { Ionicons } from '@expo/vector-icons'
 import { useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, FlatList, RefreshControl, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Search() {
@@ -39,6 +43,49 @@ export default function Search() {
     minPrice !== null,
     MaxPrice !== null,
   ].filter(Boolean).length
+
+  useEffect(()=>{
+    const debounceTimer = setTimeout(()=>{
+      fetchData();
+    },500);
+    return ()=>clearTimeout(debounceTimer);
+  },[search,type,bedrooms,minPrice,MaxPrice])
+
+  const fetchData = async()=>{
+    try {
+      setLoading(true);
+      let query = supabase.from('properties').select("*");
+      if(search){
+        query=query.or(`
+          title.ilike.%${search}%,
+          city.ilike%${search}%,
+  
+        `);
+      }
+      if(type){
+        query=query.eq('type', type);
+      }
+      if(bedrooms){
+        query=query.eq('bedrooms',bedrooms);
+      }
+      if(minPrice){
+        query=query.gte('price',minPrice)
+      }
+      if(MaxPrice){
+        query=query.lte('price',MaxPrice);
+      }
+  
+      const {data} = await query.order('created_at',{
+        ascending:true
+      });
+  
+      setResults(data ?? []);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  }
 
   return (
    <SafeAreaView className='flex-1 bg-gray-50'>
@@ -98,12 +145,89 @@ export default function Search() {
           )}
         </TouchableOpacity>
         </View>
-        {/* <Text>fdfdf</Text>  */}
+
+        {/* Filter chips  */}
+        {activeFilterCounts > 0 && (
+          <View className='flex-row flex-wrap gap-2 mt-2'>
+            {
+              type !== null && (
+                <View className='flex-row items-center bg-blue-50 border
+                  border-blue-200 rounded-full px-3 py-1 gap-2'
+                >
+                  <Text className='taxt to-blue-700 text-xs font-semibold capitalize'>
+                    {type}
+                  </Text>
+                  <TouchableOpacity onPress={()=>setType(null)}>
+                    <Ionicons name='close' color="1D4ED8" size={11} />
+                  </TouchableOpacity>
+                </View>
+              )
+            }
+            {bedrooms !== null && (
+                <View className='flex-row items-center bg-blue-50 border
+                  border-blue-200 rounded-full px-3 py-1 gap-2'
+                >
+                  <Text className='taxt to-blue-700 text-xs font-semibold capitalize'>
+                    {bedrooms=== 4 ? "4+ beds":`${bedrooms} bed${bedrooms > 1 ? "s":""}`}
+                  </Text>
+                  <TouchableOpacity onPress={()=>setBedrooms(null)}>
+                    <Ionicons name='close' color="1D4ED8" size={11} />
+                  </TouchableOpacity>
+                </View>
+              )
+            }
+            {(minPrice !== null || MaxPrice !== null) && (
+                <View className='flex-row items-center bg-blue-50 border
+                  border-blue-200 rounded-full px-3 py-1 gap-2'
+                >
+                  <Text className='taxt to-blue-700 text-xs font-semibold capitalize'>
+                    {minPrice && MaxPrice 
+                    ? `${formatPrice(minPrice)} - ${formatPrice(MaxPrice)}`
+                    :minPrice 
+                     ? `From ${formatPrice(minPrice)}`
+                     :`Up to ${formatPrice(MaxPrice!)}`}
+                  </Text>
+                  <TouchableOpacity onPress={()=>{
+                    setMinPrice(null);
+                    setMaxPrice(null);
+                  }}>
+                    <Ionicons name='close' color="1D4ED8" size={11} />
+                  </TouchableOpacity>
+                </View>
+              )
+            }
+          </View>
+        )}
       </View>
 
-      {/* Results */}
+      {/* Filter Results */}
+     <FlatList
+        data={results}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <Text className='text-sm mb-4 ml-6 text-gray-400'>
+            {loading ? "Searching...":`${results.length} properties found`}
+          </Text>
+        }
+        renderItem={({ item }) => <PropertyCard property={item} />}
+        ListEmptyComponent={
+          !loading ? (
+            <View className='items-center py-10'>
+              <Text className='text-gray-400'>
+                No Properties found
+              </Text>
+            </View>
+          ):(
+            <ActivityIndicator color="#2563EB" size="large" className='py-20'/>
+          )
+        } 
+      />
 
-      {/* Filter MOdel */}
+
+
+      {/* Filter Modal */}
       <FilterModal
       visible={showFilters}
       onClose={()=>setShowFilters(false)}
