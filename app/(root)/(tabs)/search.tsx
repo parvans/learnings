@@ -1,4 +1,3 @@
-import FeaturedCard from '@/components/FeaturedCard'
 import FilterModal from '@/components/FilterModal'
 import PropertyCard from '@/components/PropertyCard'
 import { supabase } from '@/lib/supabase'
@@ -8,7 +7,7 @@ import { Property } from '@/types'
 import { Ionicons } from '@expo/vector-icons'
 import { useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList, RefreshControl, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Search() {
@@ -28,7 +27,6 @@ export default function Search() {
     MaxPrice,
     bedrooms,
     minPrice,
-    resetFilter,
     setBedrooms,
     setMaxPrice,
     setMinPrice,
