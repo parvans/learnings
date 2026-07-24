@@ -44,7 +44,6 @@ export default function FilterModal({
 }) {
 
     const {
-        search,
         MaxPrice,
         bedrooms,
         minPrice,
@@ -52,7 +51,6 @@ export default function FilterModal({
         setBedrooms,
         setMaxPrice,
         setMinPrice,
-        setSearch,
         setType,
         type
     } = useFilterStore();
