@@ -159,6 +159,9 @@ export default function FilterModal({
                 >
                 Price Range
                 </Text>
+                <View>
+                    
+                </View>
                 {/* <View className='flex-row flex-wrap gap-2 mb-6'>
                     {
                         PRICE_PRESETS.map((item)=>(
