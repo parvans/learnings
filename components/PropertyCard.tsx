@@ -1,3 +1,4 @@
+import useSavedProperty from "@/hooks/useSavedProperty";
 import { formatPrice } from "@/lib/utils";
 import { Property } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,7 +16,8 @@ export default function PropertyCard({
   showSave?: boolean;
 }) {
   const router = useRouter();
-  const isSaved =true
+  const {isSaved, saveLoading, toggleSave} = useSavedProperty(property.id ?? "");
+  
 
   return (
     <View className="px-5">
@@ -88,6 +90,8 @@ export default function PropertyCard({
 
         <TouchableOpacity
         className="w-10 items-center pt-3"
+        onPress={toggleSave}
+        disabled={saveLoading}
         >
             <Ionicons 
             name={isSaved ? "heart" :"heart-outline"}

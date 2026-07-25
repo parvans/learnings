@@ -8,6 +8,7 @@ import { Property } from "@/types";
 import { useSupabase } from "@/hooks/useSupabase";
 import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
+import useSavedProperty from "@/hooks/useSavedProperty";
 
 const {width}=Dimensions.get("window")
 export default function PropertyDetails() {
@@ -23,6 +24,8 @@ export default function PropertyDetails() {
   const [imageViewVisible, setImageViewVisible] = useState(false);
 
   const authSupabase = useSupabase();
+  const {isSaved, saveLoading, toggleSave} = useSavedProperty(id ?? "");
+
   const fetchProperty = async()=>{
     try {
       setLoading(true);
@@ -46,8 +49,6 @@ export default function PropertyDetails() {
     const index = Math.round(e.nativeEvent.contentOffset.x/width)
     setActiveIndex(index)
   }
-
-  const isSaved = false
 
   if(!property){
     return(
@@ -98,8 +99,8 @@ export default function PropertyDetails() {
               <Ionicons name='arrow-back' color='#111827' size={20}/>
             </TouchableOpacity>
             <TouchableOpacity 
-            onPress={()=>router.back()}
-            // disabled={}
+            onPress={toggleSave}
+            disabled={saveLoading}
             className="bg-white w-10 h-10 rounded-full 
             items-center justify-center"
             style={{elevation:3}}
