@@ -220,8 +220,14 @@ export default function FilterModal({
             <View className='px-5 pb-8 pt-4 bg-white border-t border-gray-100'>
                 <TouchableOpacity
                 onPress={handleApply}
-                className='bg-blue-600 py-4 rounded-2xl items-center'
+                className={`
+                    ${activeCount === 0 
+                        ? "bg-blue-400"
+                        :"bg-blue-600"
+                    } 
+                    py-4 rounded-2xl items-center`}
                 style={shadowStyle}
+                disabled={activeCount===0}
                 >
                     <Text 
                     className='text-white font-bold text-base'
